@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign In — Forma</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f4f3ef;
+            padding: 2rem 1rem;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .login-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 2.5rem 2.25rem 2rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow:
+                0 2px 4px rgba(0, 0, 0, 0.04),
+                0 8px 24px rgba(0, 0, 0, 0.08),
+                0 24px 48px rgba(0, 0, 0, 0.06);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 1.75rem;
+        }
+
+        .brand-mark {
+            width: 32px;
+            height: 32px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-mark svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .brand-name {
+            font-family: 'DM Serif Display', serif;
+            font-size: 18px;
+            color: #1a1a1a;
+            letter-spacing: -0.3px;
+        }
+
+        .login-heading {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0 0 4px;
+            letter-spacing: -0.4px;
+        }
+
+        .login-sub {
+            font-size: 13.5px;
+            color: #888;
+            margin: 0 0 1.75rem;
+            font-weight: 400;
+        }
+
+        .field {
+            margin-bottom: 14px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: #555;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .field-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .field-header label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #555;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            margin-bottom: 0;
+        }
+
+        .forgot-link {
+            font-size: 11.5px;
+            color: #1a1a1a;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            text-decoration-color: #ccc;
+        }
+
+        .forgot-link:hover {
+            text-decoration-color: #1a1a1a;
+        }
+
+        .field input {
+            width: 100%;
+            padding: 10px 13px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            color: #1a1a1a;
+            background: #fafaf8;
+            border: 1px solid #e5e4de;
+            border-radius: 10px;
+            outline: none;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .field input:focus {
+            border-color: #1a1a1a;
+            box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.07);
+            background: #fff;
+        }
+
+        .field input::placeholder {
+            color: #bbb;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            padding-right: 40px;
+        }
+
+        .toggle-pw {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            color: #bbb;
+            display: flex;
+            align-items: center;
+            transition: color 0.15s;
+        }
+
+        .toggle-pw:hover {
+            color: #555;
+        }
+
+        .toggle-pw svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 11px;
+            background: #1a1a1a;
+            color: #fff;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            letter-spacing: 0.1px;
+            transition: background 0.15s, transform 0.1s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .btn-login:hover {
+            background: #333;
+        }
+
+        .btn-login:active {
+            transform: scale(0.985);
+        }
+
+        .signup-link {
+            text-align: center;
+            font-size: 12.5px;
+            color: #aaa;
+            margin-top: 1.25rem;
+        }
+
+        .signup-link a {
+            color: #1a1a1a;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+
+        .error-msg {
+            font-size: 12px;
+            color: #c0392b;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .field input.error {
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.08);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-card">
+
+        <div class="brand">
+            <div class="brand-mark">
+                <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="2" y="2" width="5" height="5" rx="1.5" fill="white" />
+                    <rect x="9" y="2" width="5" height="5" rx="1.5" fill="white" opacity="0.5" />
+                    <rect x="2" y="9" width="5" height="5" rx="1.5" fill="white" opacity="0.5" />
+                    <rect x="9" y="9" width="5" height="5" rx="1.5" fill="white" />
+                </svg>
+            </div>
+            <span class="brand-name">Ninshō - Minmal Auth</span>
+        </div>
+
+        <h1 class="login-heading">Welcome back</h1>
+        <p class="login-sub">Sign in to continue to your account.</p>
+
+        <div class="field">
+            <label>Username</label>
+            <input type="text" id="username-input" placeholder="Your username" />
+        </div>
+
+        <div class="field">
+            <div class="field-header">
+                <label>Password</label>
+            </div>
+            <div class="password-wrapper">
+                <input type="password" id="pw-input" placeholder="Your password" />
+                <button class="toggle-pw" onclick="togglePassword()" aria-label="Toggle password visibility"
+                    type="button">
+                    <svg id="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                    </svg>
+                </button>
+            </div>
+            <p class="error-msg" id="pw-error">Password must be at least 8 characters.</p>
+        </div>
+
+        <button class="btn-login" onclick="handleLogin()">Sign in</button>
+
+        <p class="signup-link">Don't have an account? <a href="index.html">Sign up</a></p>
+    </div>
+
+    <script>
+        function togglePassword() {
+            const input = document.getElementById('pw-input');
+            const icon = document.getElementById('eye-icon');
+            const isHidden = input.type === 'password';
+            input.type = isHidden ? 'text' : 'password';
+            icon.innerHTML = isHidden
+                ? `<path d="M17.94 12c-1.64 3.16-5 5.5-8.94 5.5S3.7 15.16 2.06 12M1 1l22 22M9.88 9.88A3 3 0 0114.12 14.12M10.73 5.08A10.43 10.43 0 0112 5c4.42 0 8.17 2.66 9.94 6.5A10.5 10.5 0 0118.5 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`
+                : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+        }
+
+        function handleLogin() {
+            const username = document.getElementById('username-input');
+            const pw = document.getElementById('pw-input');
+            const emailErr = document.getElementById('email-error');
+            const pwErr = document.getElementById('pw-error');
+            let valid = true;
+
+            const pwOk = pw.value.length >= 8;
+            pw.classList.toggle('error', !pwOk);
+            pwErr.style.display = pwOk ? 'none' : 'block';
+            if (!pwOk) valid = false;
+
+            const btn = document.querySelector('.btn-login');
+            if (valid) {
+                btn.textContent = 'Signing in…';
+                btn.style.opacity = '0.7';
+                btn.style.cursor = 'default';
+            }
+
+            fetch('https://api.freeapi.app/api/v1/users/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username.value,
+                    password: pw.value
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data);
+                    btn.textContent = 'Sign in';
+                    btn.style.opacity = '1';
+                    btn.style.cursor = 'pointer';
+
+                    if (data.success) {
+                        localStorage.setItem('token', data.data.accessToken);
+                        localStorage.setItem('user', JSON.stringify(data.data.user));
+                        window.location.href = 'dashboard.html';
+                    }
+                });
+        }
+
+        document.getElementById('pw-input').addEventListener('input', function () {
+            this.classList.remove('error');
+            document.getElementById('pw-error').style.display = 'none';
+        });
+    </script>
+</body>
+
+</html>

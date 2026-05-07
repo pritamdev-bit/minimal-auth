@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ninshō — Minimal Auth</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #f1eded;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      position: relative;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 20% 30%, rgba(255,255,255,0.03) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 80% 70%, rgba(255,255,255,0.02) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .kanji-bg {
+      position: fixed;
+      font-family: 'Shippori Mincho', serif;
+      font-size: 280px;
+      color: rgba(0,0,0,0.08);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      user-select: none;
+      pointer-events: none;
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .db-card {
+      position: relative;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 24px;
+      padding: 3rem 3rem 2.5rem;
+      max-width: 480px;
+      width: 100%;
+      backdrop-filter: blur(12px);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.04),
+        0 8px 32px rgba(0,0,0,0.5),
+        0 32px 80px rgba(0,0,0,0.4);
+    }
+
+    .db-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2.5rem;
+    }
+
+    .db-badge {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(0,0,0,0.06);
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 99px;
+      padding: 5px 12px 5px 8px;
+    }
+
+    .db-badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #4caf88;
+      box-shadow: 0 0 6px #4caf88;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .db-badge-text {
+      font-size: 11px;
+      color: rgba(0,0,0,0.8);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .db-time {
+      font-size: 11.5px;
+      color: rgba(0,0,0,0.5);
+      letter-spacing: 0.3px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .db-heading {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 36px;
+      font-weight: 600;
+      margin: 0 0 1rem;
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+    }
+
+    .db-title {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 13px;
+      font-weight: 500;
+      /* color: rgba(0, 0, 0, 0.3); */
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin: 0 0 50px;
+    }
+
+    .db-title span { color: rgba(255,255,255,0.25); font-weight: 400; }
+
+    .db-greeting-wrap {
+      height: 44px;
+      overflow: hidden;
+      margin-bottom: 2.5rem;
+      position: relative;
+    }
+
+    .db-greeting {
+      font-size: 22px;
+      font-weight: 300;
+      color: rgba(78, 75, 75, 0.75);
+      letter-spacing: -0.2px;
+      position: absolute;
+      width: 100%;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.9s ease;
+    }
+
+    .db-greeting.active { opacity: 1; transform: translateY(0); }
+    .db-greeting.exit { opacity: 0; transform: translateY(-20px); }
+    .db-greeting .username { font-weight: 500; }
+    .db-greeting .greeting-word { font-family: 'Shippori Mincho', serif; }
+
+    .db-divider {
+      height: 1px;
+      background: rgba(255,255,255,0.07);
+      margin-bottom: 2rem;
+    }
+
+    .db-actions { display: flex; gap: 12px; }
+
+    .btn-profile {
+      flex: 1;
+      padding: 11px 16px;
+      background: #fff;
+      color: #0e0e0e;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.15s, transform 0.1s;
+      letter-spacing: -0.1px;
+    }
+
+    .btn-profile:hover { background: #e8e8e8; }
+    .btn-profile:active { transform: scale(0.975); }
+    .btn-profile svg { width: 15px; height: 15px; }
+
+    .btn-logout {
+      padding: 11px 16px;
+      background: transparent;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13.5px;
+      font-weight: 400;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.1s;
+      white-space: nowrap;
+    }
+
+    .btn-logout:hover {
+      color: rgba(0,0,0,0.7);
+    }
+
+    .btn-logout:active { transform: scale(0.975); }
+    .btn-logout svg { width: 15px; height: 15px; }
+
+    .db-profile-modal {
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      background: rgba(14,14,14,0.97);
+      border: 1px solid rgba(255,255,255,0.09);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      padding: 2rem;
+    }
+
+    .db-profile-modal.visible { opacity: 1; pointer-events: all; }
+
+    .db-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Shippori Mincho', serif;
+      font-size: 22px;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .db-profile-name {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 20px;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .db-profile-role {
+      font-size: 12px;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 1.5px;
+      /* text-transform: uppercase; */
+    }
+
+    .db-profile-row { display: flex; align-items: center; justify-content: center; gap: 32px; margin-top: 12px; }
+    .db-profile-stat { text-align: center; }
+    .db-profile-stat-val { font-family: 'Shippori Mincho', serif; font-size: 22px; color: #fff; font-weight: 600; }
+    .db-profile-stat-label { font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 0.5px; margin-top: 2px; }
+
+    .db-profile-close {
+      margin-top: 10px;
+      padding: 8px 20px;
+      background: transparent;
+      color: rgba(255,255,255,0.35);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12.5px;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .db-profile-close:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.6); }
+  </style>
+</head>
+<body>
+
+  <div class="kanji-bg">認証</div>
+
+  <div class="db-card">
+
+    <div class="db-top-bar">
+      <div class="db-badge">
+        <div class="db-badge-dot"></div>
+        <span class="db-badge-text">Authenticated</span>
+      </div>
+      <span class="db-time" id="db-clock"></span>
+    </div>
+
+    <p class="db-heading">Ninshō</p>
+    <h1 class="db-title">Minimal Auth<span>.</span></h1>
+
+    <div class="db-greeting-wrap" id="greeting-wrap"></div>
+
+    <div class="db-divider"></div>
+
+    <div class="db-actions">
+      <button class="btn-profile" onclick="showProfile()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        Get User Profile
+      </button>
+      <button class="btn-logout" onclick="handleLogout()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Logout
+      </button>
+    </div>
+
+    <div class="db-profile-modal" id="profile-modal">
+      <div class="db-avatar">田</div>
+      <div class="db-profile-name" id="profile-name">Tanaka User</div>
+      <div class="db-profile-role" id="profile-role">Admin | mandalpritam@example.com</div>
+      <div class="db-profile-row">
+        <div class="db-profile-stat">
+          <div class="db-profile-stat-val">Active</div>
+          <div class="db-profile-stat-label">Session</div>
+        </div>
+        <div class="db-profile-stat">
+          <div class="db-profile-stat-val">∞</div>
+          <div class="db-profile-stat-label">Days Active</div>
+        </div>
+        <div class="db-profile-stat">
+          <div class="db-profile-stat-val">IN</div>
+          <div class="db-profile-stat-label">Region</div>
+        </div>
+      </div>
+      <button class="db-profile-close" onclick="hideProfile()">Close</button>
+    </div>
+
+  </div>
+
+  <script>
+    let username = 'Tanaka';
+    let email = 'tanaka@example.com';
+    let role = 'Admin';
+
+    window.addEventListener('load', function() {
+        fetch('https://api.freeapi.app/api/v1/users/current-user').then(res => res.json()).then(data => {
+            console.log(data);
+            username = data.data.username;
+            email = data.data.email;
+            role = data.data.role;
+
+            document.getElementById('profile-name').textContent = username;
+            document.getElementById('profile-role').textContent = `${role} | ${email}`;
+        })
+    })
+
+
+    const greetings = [
+      { word: 'Hello', lang: '' },
+      { word: 'こんにちは', lang: 'ja', meaning: 'Konnichiwa' },
+      { word: 'नमस्कार', lang: 'hi', meaning: 'Namaskar' },
+      { word: 'Hello', lang: '' },
+      { word: 'やあ', lang: 'ja', meaning: 'Yaa' },
+      { word: 'ようこそ', lang: 'ja', meaning: 'Yōkoso' },
+    ];
+
+    let current = 0;
+    const wrap = document.getElementById('greeting-wrap');
+
+    function makeEl(g) {
+      const el = document.createElement('div');
+      el.className = 'db-greeting';
+      const wordClass = g.lang ? 'greeting-word' : '';
+      const title = g.meaning ? ` title="${g.meaning}"` : '';
+      el.innerHTML = `<span class="${wordClass}"${title}>${g.word}</span>, <span class="username">${username}</span>`;
+      return el;
+    }
+
+    let activeEl = makeEl(greetings[0]);
+    wrap.appendChild(activeEl);
+    requestAnimationFrame(() => activeEl.classList.add('active'));
+
+    setInterval(() => {
+      current = (current + 1) % greetings.length;
+      const next = makeEl(greetings[current]);
+      wrap.appendChild(next);
+      activeEl.classList.add('exit');
+      requestAnimationFrame(() => next.classList.add('active'));
+      setTimeout(() => { activeEl.remove(); activeEl = next; }, 650);
+    }, 2400);
+
+    function tick() {
+      const now = new Date();
+      document.getElementById('db-clock').textContent =
+        now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+    tick();
+    setInterval(tick, 1000);
+
+    function showProfile() {
+      document.getElementById('profile-modal').classList.add('visible');
+    }
+
+    function hideProfile() {
+      document.getElementById('profile-modal').classList.remove('visible');
+    }
+
+    function handleLogout() {
+      const card = document.querySelector('.db-card');
+      card.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+      card.style.opacity = '0';
+      card.style.transform = 'scale(0.96)';
+
+      fetch('https://api.freeapi.app/api/v1/users/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      }).then(() => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = 'login.html';
+
+      })
+      setTimeout(() => {
+        card.innerHTML = `<div style="text-align:center; padding: 2rem; font-family:'Shippori Mincho',serif; color:rgba(255,255,255,0.4); font-size:15px; letter-spacing:1px;">またね — See you again.</div>`;
+        card.style.opacity = '1';
+        card.style.transform = 'scale(1)';
+      }, 400);
+    }
+  </script>
+</body>
+</html>
